@@ -1,0 +1,14 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Register for an account" %}{% endblock %}
+{% block content %}
+<br>
+<button class="special small" onclick=location.href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Twitterアカウントで登録</button>
+<hr>
+<table>
+    <form method='post' action=''>{% csrf_token %}
+        {{ form }}
+        <tr><td></td><td><input type="submit" value="{% trans "アカウント認証メールを送信" %}" /></td>
+    </form>
+</table>
+{% endblock %}

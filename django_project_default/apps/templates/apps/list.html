@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Object List{% endblock %}
+
+{% block content %}
+  <section>
+    <h2>Object List</h2>
+    {% for object in object_list %}
+      <a href="{% url 'apps:detail' object.id %}">{{ object.name }}</a>
+    {% endfor %}
+  </section>
+{% endblock %}
