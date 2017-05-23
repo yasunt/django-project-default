@@ -1,9 +1,11 @@
+import json
+
 from accounts.models import CustomUser
 from .models import Something, Tag
 
 
 def make_example_objects():
-    
+
     user = CustomUser.objects.create_user(username='test_user01', password='testuser01')
 
     for i in range(10):

@@ -7,5 +7,6 @@
   <article>
     <h2>Name: {{ object.name }}</h2>
     <p>Description: {{ object.description }}</p>
+    <p>Tags: {% for tag in object.tags.all %}{{ tag.name }}{% endfor %}</p>
   </article>
 {% endblock %}

@@ -21,7 +21,7 @@ from .views import IndexView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^apps/', include('apps.urls')),
+    url(r'^something/', include('something.urls')),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^', include('social.apps.django_app.urls', namespace='social')),
     url(r'^', include('registration.backends.hmac.urls')),

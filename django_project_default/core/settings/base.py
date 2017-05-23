@@ -34,10 +34,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # third party applications
     'registration',
+    'braces',
     'rest_framework',
     'social.apps.django_app.default',
     # local applications
-    'apps.apps.AppsConfig',
+    'something.apps.SomethingConfig',
     'core.apps.CoreConfig',
     'accounts.apps.AccountsConfig',
 ]
