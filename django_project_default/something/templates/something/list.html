@@ -6,7 +6,9 @@
   <section>
     <h2>Object List</h2>
     {% for object in object_list %}
-      <a href="{% url 'something:detail' object.id %}">{{ object.name }}</a>
+      <section>
+        <a href="{% url 'something:detail' object.id %}">{{ object.name }}</a>
+      </section>
     {% endfor %}
   </section>
 {% endblock %}

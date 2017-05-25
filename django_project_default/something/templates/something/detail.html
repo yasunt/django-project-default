@@ -8,5 +8,14 @@
     <h2>Name: {{ object.name }}</h2>
     <p>Description: {{ object.description }}</p>
     <p>Tags: {% for tag in object.tags.all %}{{ tag.name }}{% endfor %}</p>
+    {% if request.user == object.user %}
+      <a href="{% url 'something:update' object.id %}">編集</a>
+      <p>
+        <form method="POST" action="{% url 'something:delete' object.id %}">
+          {% csrf_token %}
+          <button type="submit">Delete</button>
+        </form>
+      </p>
+    {% endif %}
   </article>
 {% endblock %}
