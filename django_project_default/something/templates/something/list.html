@@ -11,4 +11,10 @@
       </section>
     {% endfor %}
   </section>
+  <section>
+    Page:
+    {% for page_i in pages %}
+      <a href="{% url 'something:list' page_i %}">{{ page_i }}</a>
+    {% endfor %}
+  </section>
 {% endblock %}

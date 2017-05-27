@@ -1,4 +1,5 @@
 import json
+import math
 
 from django.shortcuts import render, get_object_or_404
 from django.core import serializers
@@ -25,10 +26,30 @@ class AuthorValidTestMixin(UserPassesTestMixin):
             return True
 
 
-class ObjectListView(ListView):
+class PaginateMixin(View):
+    '''Mixin which implements pagination.
+    You have to define a model class variable in child class.'''
+
+    def get_queryset(self):
+        page = self.kwargs.get('page')
+        if page:
+            page = int(page)
+            queryset = self.__class__.model.objects.all()[10*(page-1):10*page]
+        else:
+            queryset = self.__class__.model.objects.all()[:10]
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pages'] = list(range(1, (math.ceil(self.__class__.model.objects.count() / 10)+1)))
+        return context
+
+
+class ObjectListView(PaginateMixin, ListView):
 
     template_name = 'something/list.html'
     queryset = Something.objects.all()
+    model = Something
     context_object_name = 'object_list'
 
 
@@ -36,6 +57,16 @@ class ObjectListJsonResponseView(View):
 
     def get(self, request):
         return JsonResponse({'object_list': json.dumps(serializers.serialize('json', Something.objects.all()))})
+
+
+class ObjectFilterbyTagView(PaginateMixin, ListView):
+
+    template_name ='something/list.html'
+    model = Something
+
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, id=self.kwargs['tag_id'])
+        return tag.something_set.all() if tag else None
 
 
 class ObjectDetailView(DetailView):
