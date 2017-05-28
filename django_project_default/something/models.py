@@ -1,9 +1,10 @@
 from django.db import models
 
+from core.models import TimeStampedModel
 from accounts.models import CustomUser
 
 
-class Tag(models.Model):
+class Tag(TimeStampedModel):
 
     def __str__(self):
         return self.name
@@ -11,7 +12,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=20)
 
 
-class Something(models.Model):
+class Something(TimeStampedModel):
 
     def __str__(self):
         return self.name
