@@ -7,7 +7,7 @@
   <article>
     <h2>Name: {{ object.name }}</h2>
     <p>Description: {{ object.description }}</p>
-    <p>Tags: {% for tag in object.tags.all %}<a href="{% url 'something:tag' tag.id %}">{{ tag.name }}</a>{% endfor %}</p>
+    <p>Tags: {% for tag in object.tags.all %}<a href="{% url 'something:search' %}?tag_id={{ tag.id }}">{{ tag.name }}</a>{% endfor %}</p>
     {% if request.user == object.user %}
       <a href="{% url 'something:update' object.id %}">編集</a>
       <p>

@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block title %}Index | {{ sitename }}{% endblock %}
+
 {% block content %}
-  Test
+  Index Page
+  <p>
+    <form method="GET" action="{% url 'something:search' %}">
+      <input type="search" name="q"/>
+      <button type="submit">Submit</button>
+    </form>
+  </p>
 {% endblock %}

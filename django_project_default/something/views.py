@@ -2,9 +2,11 @@ import json
 import math
 
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http.response import JsonResponse
 from django.core.urlresolvers import reverse, reverse_lazy
@@ -16,57 +18,30 @@ from .forms import SomethingPostForm
 
 
 class AuthorValidTestMixin(UserPassesTestMixin):
-    '''Raise permission error if request-user dosen't equal object author.'''
+    """
+    Raise permission error if request-user dosen't equal object author.
+    """
 
     def test_func(self):
         if not self.request.user ==  self.get_object().user:
-            print('You: {0}, Author: {1}'.format(self.request.user, self.get_object().user))
             raise PermissionError('You are not object author.')
         else:
             return True
 
 
-class PaginateMixin(View):
-    '''Mixin which implements pagination.
-    You have to define a model class variable in child class.'''
-
-    def get_queryset(self):
-        page = self.kwargs.get('page')
-        if page:
-            page = int(page)
-            queryset = self.__class__.model.objects.all()[10*(page-1):10*page]
-        else:
-            queryset = self.__class__.model.objects.all()[:10]
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['pages'] = list(range(1, (math.ceil(self.__class__.model.objects.count() / 10)+1)))
-        return context
-
-
-class ObjectListView(PaginateMixin, ListView):
+class ObjectListView(ListView):
 
     template_name = 'something/list.html'
     queryset = Something.objects.all()
     model = Something
     context_object_name = 'object_list'
+    paginate_by = 10
 
 
 class ObjectListJsonResponseView(View):
 
     def get(self, request):
         return JsonResponse({'object_list': json.dumps(serializers.serialize('json', Something.objects.all()))})
-
-
-class ObjectFilterbyTagView(PaginateMixin, ListView):
-
-    template_name ='something/list.html'
-    model = Something
-
-    def get_queryset(self):
-        tag = get_object_or_404(Tag, id=self.kwargs['tag_id'])
-        return tag.something_set.all() if tag else None
 
 
 class ObjectDetailView(DetailView):
@@ -106,7 +81,6 @@ class ObjectUpdateView(LoginRequiredMixin, AuthorValidTestMixin, UserFormKwargsM
 
     def get_object(self):
         obj = super().get_object()
-        print(obj)
         return obj
 
     def get_form_kwargs(self):
@@ -121,3 +95,24 @@ class ObjectDeleteView(LoginRequiredMixin, AuthorValidTestMixin, UserFormKwargsM
 
     model = Something
     success_url = reverse_lazy('something:list')
+
+
+class ObjectSearchView(ListView):
+
+    template_name = 'something/search.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        query = Q()
+        tag_id = self.request.GET.get('tag_id')
+        tag = get_object_or_404(Tag, id=tag_id) if tag_id else None
+        query = query & Q(tags=tag) if tag else query
+        name_contains = self.request.GET.get('q')
+        query = query & Q(name__contains=name_contains) if name_contains else query
+        return Something.objects.filter(query)
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        query_dict = {key: value for key, value in self.request.GET.items()}
+        context.update(query_dict)
+        return context

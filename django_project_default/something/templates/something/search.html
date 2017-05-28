@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Object List | {{ sitename }}{% endblock %}
+{% block title %}Search Result | {{ sitename }}{% endblock %}
 
 {% block content %}
   <section>
-    <h2>Object List</h2>
+    <h2>Search Result</h2>
     {% for object in object_list %}
       <section>
         <a href="{% url 'something:detail' object.id %}">{{ object.name }}</a>
@@ -15,13 +15,13 @@
         <div class="pagination">
             <span class="page-links">
                 {% if page_obj.has_previous %}
-                    <a href="{% url 'something:list' %}?page={{ page_obj.previous_page_number }}">previous</a>
+                    <a href="{% url 'something:search' %}?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}">previous</a>
                 {% endif %}
                 <span class="page-current">
                     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
                 </span>
                 {% if page_obj.has_next %}
-                    <a href="{% url 'something:list' %}?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="{% url 'something:search' %}?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}">next</a>
                 {% endif %}
             </span>
         </div>
