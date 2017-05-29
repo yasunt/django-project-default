@@ -1,5 +1,5 @@
+__pycache__
 venv
 migrations
 *.log
-__pycache__
 *.sqlite3
