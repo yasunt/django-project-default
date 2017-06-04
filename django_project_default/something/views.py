@@ -1,20 +1,23 @@
 import json
 import math
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+)
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http.response import JsonResponse
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.forms import formset_factory
 
 from braces.views import UserFormKwargsMixin
 
-from .models import Something, Tag
-from .forms import SomethingPostForm
+from .models import Something, Tag, UserPostImage
+from .forms import SomethingPostForm, UserPostImageForm, UserPostImageFormSet
 
 
 class AuthorValidTestMixin(UserPassesTestMixin):
@@ -61,12 +64,38 @@ class ObjectCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
     form_class = SomethingPostForm
     template_name = 'something/create.html'
 
+    def post(self, request):
+        something_form = SomethingPostForm(**self.get_form_kwargs())
+        formset = UserPostImageFormSet(request.POST, request.FILES)
+
+        if something_form.is_valid():
+            if formset.is_valid():
+                something = something_form.save()
+
+                for form in formset.cleaned_data:
+                    if not form:
+                        continue
+                    image = UserPostImage(image=form['image'], something=something)
+                    image.save()
+            else:
+                raise TypeError('Uploaing files contain non-image files.')
+        else:
+            # implement error handling operation
+            raise ValidationError('Posted content is not valid.')
+
+        return redirect(self.get_success_url())
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         tag_id = self.request.POST.get('tags')
         if tag_id:
             kwargs['tags'] = Tag.objects.filter(id=tag_id)
         return kwargs
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['image_formset'] = UserPostImageFormSet
+        return context
 
     def get_success_url(self):
         return reverse('something:list')

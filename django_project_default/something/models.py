@@ -21,3 +21,9 @@ class Something(TimeStampedModel):
     description = models.TextField(max_length=1000)
     user = models.ForeignKey(CustomUser)
     tags = models.ManyToManyField(Tag)
+
+
+class UserPostImage(TimeStampedModel):
+
+    image = models.ImageField(upload_to='media/something/', blank=True)
+    something = models.ForeignKey(Something)
