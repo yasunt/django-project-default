@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <form method="POST" action="{% url 'something:create' %}">
+  <form method="POST" action="{% url 'something:create' %}" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
+    {{ image_formset.as_p }}
     <button type="submit">Submit</button>
   </form>
 {% endblock %}

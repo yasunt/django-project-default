@@ -25,5 +25,5 @@ class Something(TimeStampedModel):
 
 class UserPostImage(TimeStampedModel):
 
-    image = models.ImageField(upload_to='media/something/', blank=True)
+    image = models.ImageField(upload_to='something/', blank=True)
     something = models.ForeignKey(Something)
